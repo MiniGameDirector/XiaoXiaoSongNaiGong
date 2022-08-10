@@ -9,6 +9,7 @@ using System;
 using System.Text;
 using System.Security.Cryptography;
 using UnityEngine.SceneManagement;
+using System.Text.RegularExpressions;
 
 public class HTTPConnect : MonoBehaviour
 {
@@ -105,7 +106,7 @@ public class HTTPConnect : MonoBehaviour
             }
             else
             {
-                ChinarMessage.MessageBox(IntPtr.Zero, resultData.msg, "提示", 0);
+                ChinarMessage.MessageBox(IntPtr.Zero, Unicode2String(resultData.msg), "提示", 0);
                 Application.Quit();
             }
         }
@@ -113,6 +114,11 @@ public class HTTPConnect : MonoBehaviour
 
         //测试数据
 
+    }
+    public string Unicode2String(string source)
+    {
+        return new Regex(@"\\u([0-9A-F]{4})", RegexOptions.IgnoreCase).Replace(
+             source, x => string.Empty + Convert.ToChar(Convert.ToUInt16(x.Result("$1"), 16)));
     }
 
 }
