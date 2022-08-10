@@ -34,8 +34,12 @@ public class UIManager : MonoBehaviour
     public Transform panelRecord;
     public Transform panelOver;
     public Text txtJifenBan1, txtJifenBan2;
+    public Button btnMilk1, btnMilk2;
     public bool canChangeScene = false;
     private bool isWin = false;
+
+    private int leftMilkCount = 10, rightMilkCount = 10;
+    public bool leftBtnClick = false;
     /// <summary>
     /// 初始化事件
     /// </summary>
@@ -79,6 +83,14 @@ public class UIManager : MonoBehaviour
             }
             panelOver.gameObject.SetActive(false);
         });
+
+        //下边的奶瓶按钮
+        btnMilk1.onClick.AddListener(delegate() {
+            MilkClickEvent(0);
+        });
+        btnMilk2.onClick.AddListener(delegate () {
+            MilkClickEvent(1);
+        });
     }
     /// <summary>
     /// 如果胜利了恢复游戏事件
@@ -100,6 +112,7 @@ public class UIManager : MonoBehaviour
         text2.fontStyle = FontStyle.Normal;
         text2.color = Color.white;
         initObj.gameObject.SetActive(true);
+        initObj.GetComponent<BearController>().bearAnimator.Play("Run");
         AudioController.GetInstance().StartGame();
         panelRecord.gameObject.SetActive(false);
         ObjectController.GetInstance().GameScene(false);
@@ -115,9 +128,9 @@ public class UIManager : MonoBehaviour
         Text text2 = btnStartScene.transform.GetChild(0).GetComponent<Text>();
         text2.fontStyle = FontStyle.Normal;
         text2.color = Color.white;
-        initObj.gameObject.SetActive(false);
+        //initObj.gameObject.SetActive(false);
         panelRecord.gameObject.SetActive(true);
-        ObjectController.GetInstance().GameScene();
+        //ObjectController.GetInstance().GameScene();
     }
     /// <summary>
     /// 游戏结束事件
@@ -136,14 +149,32 @@ public class UIManager : MonoBehaviour
         Application.Quit();
     }
     /// <summary>
-    /// 返回目录事件
+    /// 奶瓶按钮的点击事件
     /// </summary>
-    private void TurnMenuEvent() { 
-    
+    /// <param name="milkBtnIndex"></param>
+    private void MilkClickEvent(int milkBtnIndex) {
+        if (milkBtnIndex == 0 && leftMilkCount > 0)//左侧的按钮
+        {
+            leftBtnClick = true;
+            leftMilkCount--;
+            Text tMilkLeft = btnMilk1.transform.Find("Text").GetComponent<Text>();
+            tMilkLeft.text = leftMilkCount.ToString();
+            tMilkLeft.color = new Color((10 - leftMilkCount) * 25.5f / 255f, leftMilkCount * 25.5f / 255f, 0);
+        }
+        else if(milkBtnIndex == 1 && rightMilkCount > 0)
+        {
+            leftBtnClick = false;
+            rightMilkCount--;
+            Text tMilkRight = btnMilk2.transform.Find("Text").GetComponent<Text>();
+            tMilkRight.text = rightMilkCount.ToString();
+            tMilkRight.color = new Color((10 - rightMilkCount) * 25.5f / 255f, rightMilkCount * 25.5f / 255f, 0);
+        }
     }
     // Start is called before the first frame update
     void Start()
     {
+        Debug.LogError("开始游戏测试");
+        StartScene();
         InitButtonEvent();
     }
 

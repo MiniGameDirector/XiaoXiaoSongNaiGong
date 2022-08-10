@@ -20,10 +20,12 @@ public class ObjectController : MonoBehaviour
     }
     #endregion
 
-
-    public List<Transform> cameraPos = new List<Transform>();
-    public List<Transform> areas = new List<Transform>();
-    public Transform nowArea;
+    public List<Transform> listHouses = new List<Transform>();
+    public List<Transform> listCameraPos = new List<Transform>();
+    public List<Transform> listBearPos = new List<Transform>();
+    public List<Transform> listMilkPos = new List<Transform>();
+    public Transform bearTrans;
+    public Transform leftMilk, rightMilk;
     // Start is called before the first frame update
     void Start()
     {
@@ -33,7 +35,10 @@ public class ObjectController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-           
+        if (Input.GetKeyUp(KeyCode.A))
+        {
+            GameScene();
+        }
     }
     /// <summary>
     /// 进出游戏事件
@@ -45,13 +50,13 @@ public class ObjectController : MonoBehaviour
         {
             Debug.Log("进入游戏");
             //设置相机的位置
-            //CameraToPoint(1);
+            CameraToPoint(Random.Range(1, 12));
         }
         else
         {
             Debug.Log("退出游戏");
             //设置相机的位置
-            //CameraToPoint(0);       
+            CameraToPoint(0);       
         }
     }
     /// <summary>
@@ -59,9 +64,31 @@ public class ObjectController : MonoBehaviour
     /// </summary>
     /// <param name="areaIndex">点位的序号</param>
     public void CameraToPoint(int areaIndex) {
-        Camera.main.transform.DOMove(cameraPos[areaIndex].localPosition, 1f).SetEase(Ease.Linear);
-        Camera.main.transform.DORotate(cameraPos[areaIndex].localEulerAngles, 1f).SetEase(Ease.Linear).OnComplete(delegate() {
-        });
+        if (areaIndex != 0)
+        {
+            if (bearTrans.GetComponent<BearController>().SetBearMove(listBearPos[areaIndex].position))
+            {
+                Camera.main.transform.DOMove(listCameraPos[areaIndex].localPosition, 2f).SetEase(Ease.Linear);
+                Camera.main.transform.DORotate(listCameraPos[areaIndex].localEulerAngles, 2f).SetEase(Ease.Linear).OnComplete(delegate() {
+                    listHouses[areaIndex - 1].GetComponent<Animator>().enabled = true;
+                    if (UIManager.GetInstance().leftBtnClick)
+                    {
+                        leftMilk.GetComponent<Milk>().targetPos = listMilkPos[areaIndex - 1].position;
+                        leftMilk.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        rightMilk.GetComponent<Milk>().targetPos = listMilkPos[areaIndex - 1].position;
+                        rightMilk.gameObject.SetActive(true);
+                    }
+                    //listHouses[areaIndex - 1].DOLocalRotate(new Vector3(0,0,))
+                });
+            }
+        }
+        else
+        {
+            bearTrans.GetComponent<BearController>().BearStart();
+        }
     }
     
 }
