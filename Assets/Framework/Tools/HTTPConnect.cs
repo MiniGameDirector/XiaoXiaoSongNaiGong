@@ -85,7 +85,7 @@ public class HTTPConnect : MonoBehaviour
 
     IEnumerator Startclint()
     {
-        UnityWebRequest unityWebRequest = new UnityWebRequest(url);
+        UnityWebRequest unityWebRequest = UnityWebRequest.Get(url);
         yield return unityWebRequest.SendWebRequest();
 
         if (unityWebRequest.error != null)
