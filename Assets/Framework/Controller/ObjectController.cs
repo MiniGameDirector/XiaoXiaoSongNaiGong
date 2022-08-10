@@ -26,6 +26,7 @@ public class ObjectController : MonoBehaviour
     public List<Transform> listMilkPos = new List<Transform>();
     public Transform bearTrans;
     public Transform leftMilk, rightMilk;
+    private int houseIndex = 1;
     // Start is called before the first frame update
     void Start()
     {
@@ -39,6 +40,10 @@ public class ObjectController : MonoBehaviour
         {
             GameScene();
         }
+        if (Input.GetKeyUp(KeyCode.B))
+        {
+            SongNai();
+        }
     }
     /// <summary>
     /// 进出游戏事件
@@ -50,7 +55,15 @@ public class ObjectController : MonoBehaviour
         {
             Debug.Log("进入游戏");
             //设置相机的位置
-            CameraToPoint(Random.Range(1, 12));
+            CameraToPoint(houseIndex);
+            if (houseIndex > 11)
+            {
+                houseIndex = 1;
+            }
+            else
+            {
+                houseIndex++;
+            }
         }
         else
         {
@@ -71,6 +84,7 @@ public class ObjectController : MonoBehaviour
                 Camera.main.transform.DOMove(listCameraPos[areaIndex].localPosition, 2f).SetEase(Ease.Linear);
                 Camera.main.transform.DORotate(listCameraPos[areaIndex].localEulerAngles, 2f).SetEase(Ease.Linear).OnComplete(delegate() {
                     listHouses[areaIndex - 1].GetComponent<Animator>().enabled = true;
+                    listHouses[areaIndex - 1].GetChild(0).GetComponent<MeshCollider>().enabled = true;
                     if (UIManager.GetInstance().leftBtnClick)
                     {
                         leftMilk.GetComponent<Milk>().targetPos = listMilkPos[areaIndex - 1].position;
@@ -87,8 +101,31 @@ public class ObjectController : MonoBehaviour
         }
         else
         {
-            bearTrans.GetComponent<BearController>().BearStart();
+            Camera.main.transform.DOMove(listCameraPos[areaIndex].localPosition, 2f).SetEase(Ease.Linear);
+            Camera.main.transform.DORotate(listCameraPos[areaIndex].localEulerAngles, 2f).SetEase(Ease.Linear).OnComplete(delegate ()
+            {
+                bearTrans.GetComponent<BearController>().BearStart();
+            });
         }
+    }
+    public void SongNai() {
+
+        AudioController.GetInstance().DisableOther();
+        if (UIManager.GetInstance().leftBtnClick)
+        {
+            leftMilk.GetComponent<Milk>().SongNai();
+        }
+        else
+        {
+            rightMilk.GetComponent<Milk>().SongNai();
+        }
+        StartCoroutine(AudioController.GetInstance().SetAudioClipByName("门铃", false, AudioController.GetInstance().CreateAudio()));
+        StartCoroutine(AudioController.GetInstance().SetAudioClipByName("好喝" + (houseIndex % 6 + 1).ToString(), false, AudioController.GetInstance().CreateAudio(),delegate() {
+            if (UIManager.GetInstance().isWin)
+            {
+                UIManager.GetInstance().GameOverEvent(true);
+            }
+        }));
     }
     
 }

@@ -2,6 +2,7 @@ using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
@@ -36,7 +37,7 @@ public class UIManager : MonoBehaviour
     public Text txtJifenBan1, txtJifenBan2;
     public Button btnMilk1, btnMilk2;
     public bool canChangeScene = false;
-    private bool isWin = false;
+    public bool isWin = false;
 
     private int leftMilkCount = 10, rightMilkCount = 10;
     public bool leftBtnClick = false;
@@ -76,12 +77,7 @@ public class UIManager : MonoBehaviour
         //恢复游戏
         btnReturn.onClick.AddListener(delegate ()
         {
-            AudioController.GetInstance().DisableOther();
-            if (isWin)
-            {
-                WinGameReturn();
-            }
-            panelOver.gameObject.SetActive(false);
+            WinGameReturn();
         });
 
         //下边的奶瓶按钮
@@ -95,9 +91,16 @@ public class UIManager : MonoBehaviour
     /// <summary>
     /// 如果胜利了恢复游戏事件
     /// </summary>
-    private void WinGameReturn() {
-        StartScene();
-        txtJifenBan1.text = "0";
+    public void WinGameReturn() {
+        AudioController.GetInstance().DisableOther();
+        if (isWin)
+        {
+            StartScene();
+            txtJifenBan1.text = "0";
+            isWin = false;
+        }
+        panelOver.gameObject.SetActive(false);
+        
     }
     /// <summary>
     /// 开场场景按钮事件
@@ -112,7 +115,7 @@ public class UIManager : MonoBehaviour
         text2.fontStyle = FontStyle.Normal;
         text2.color = Color.white;
         initObj.gameObject.SetActive(true);
-        initObj.GetComponent<BearController>().bearAnimator.Play("Run");
+        //initObj.GetComponent<NavMeshAgent>().Stop();
         AudioController.GetInstance().StartGame();
         panelRecord.gameObject.SetActive(false);
         ObjectController.GetInstance().GameScene(false);
@@ -139,7 +142,7 @@ public class UIManager : MonoBehaviour
         Debug.Log("游戏结束");
         isWin = _iswin;
         AudioController.GetInstance().DisableOther();
-        StartCoroutine(AudioController.GetInstance().SetAudioClipByName("胜利3", false, AudioController.GetInstance().CreateAudio()));
+        StartCoroutine(AudioController.GetInstance().SetAudioClipByName("胜利4", false, AudioController.GetInstance().CreateAudio()));
         panelOver.gameObject.SetActive(true);
     }
     /// <summary>
@@ -160,6 +163,8 @@ public class UIManager : MonoBehaviour
             Text tMilkLeft = btnMilk1.transform.Find("Text").GetComponent<Text>();
             tMilkLeft.text = leftMilkCount.ToString();
             tMilkLeft.color = new Color((10 - leftMilkCount) * 25.5f / 255f, leftMilkCount * 25.5f / 255f, 0);
+            ObjectController.GetInstance().GameScene();
+            
         }
         else if(milkBtnIndex == 1 && rightMilkCount > 0)
         {
@@ -168,6 +173,11 @@ public class UIManager : MonoBehaviour
             Text tMilkRight = btnMilk2.transform.Find("Text").GetComponent<Text>();
             tMilkRight.text = rightMilkCount.ToString();
             tMilkRight.color = new Color((10 - rightMilkCount) * 25.5f / 255f, rightMilkCount * 25.5f / 255f, 0);
+            ObjectController.GetInstance().GameScene();
+        }
+        if (rightMilkCount == 0 && leftMilkCount == 0)
+        {
+            isWin = true;
         }
     }
     // Start is called before the first frame update
