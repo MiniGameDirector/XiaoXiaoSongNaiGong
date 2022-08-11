@@ -24,8 +24,10 @@ public class ObjectController : MonoBehaviour
     public List<Transform> listCameraPos = new List<Transform>();
     public List<Transform> listBearPos = new List<Transform>();
     public List<Transform> listMilkPos = new List<Transform>();
+    public List<Transform> listMilks = new List<Transform>();
     public Transform bearTrans;
-    public Transform leftMilk, rightMilk;
+    public Transform leftTarget, rightTarget;
+    public GameObject milkGo;
     private int houseIndex = 1;
     // Start is called before the first frame update
     void Start()
@@ -77,6 +79,7 @@ public class ObjectController : MonoBehaviour
     /// </summary>
     /// <param name="areaIndex">点位的序号</param>
     public void CameraToPoint(int areaIndex) {
+        Resources.UnloadUnusedAssets();
         if (areaIndex != 0)
         {
             if (bearTrans.GetComponent<BearController>().SetBearMove(listBearPos[areaIndex].position))
@@ -87,13 +90,19 @@ public class ObjectController : MonoBehaviour
                     listHouses[areaIndex - 1].GetChild(0).GetComponent<MeshCollider>().enabled = true;
                     if (UIManager.GetInstance().leftBtnClick)
                     {
-                        leftMilk.GetComponent<Milk>().targetPos = listMilkPos[areaIndex - 1].position;
-                        leftMilk.gameObject.SetActive(true);
+                        GameObject go = Instantiate(milkGo);
+                        go.transform.position = leftTarget.position;
+                        go.transform.localScale = Vector3.zero;
+                        go.GetComponent<Milk>().targetPos = listMilkPos[areaIndex - 1].position;
+                        listMilks.Add(go.transform);
                     }
                     else
                     {
-                        rightMilk.GetComponent<Milk>().targetPos = listMilkPos[areaIndex - 1].position;
-                        rightMilk.gameObject.SetActive(true);
+                        GameObject go = Instantiate(milkGo);
+                        go.transform.position = rightTarget.position;
+                        go.transform.localScale = Vector3.zero;
+                        go.GetComponent<Milk>().targetPos = listMilkPos[areaIndex - 1].position;
+                        listMilks.Add(go.transform);
                     }
                     //listHouses[areaIndex - 1].DOLocalRotate(new Vector3(0,0,))
                 });
@@ -101,24 +110,21 @@ public class ObjectController : MonoBehaviour
         }
         else
         {
-            Camera.main.transform.DOMove(listCameraPos[areaIndex].localPosition, 2f).SetEase(Ease.Linear);
-            Camera.main.transform.DORotate(listCameraPos[areaIndex].localEulerAngles, 2f).SetEase(Ease.Linear).OnComplete(delegate ()
-            {
-                bearTrans.GetComponent<BearController>().BearStart();
-            });
+            bearTrans.GetComponent<BearController>().isStart = true;
+            if (bearTrans.GetComponent<BearController>().SetBearMove(listBearPos[areaIndex].position)) {
+                Camera.main.transform.DOMove(listCameraPos[areaIndex].localPosition, 2f).SetEase(Ease.Linear);
+                Camera.main.transform.DORotate(listCameraPos[areaIndex].localEulerAngles, 2f).SetEase(Ease.Linear);
+            } 
         }
     }
     public void SongNai() {
 
         AudioController.GetInstance().DisableOther();
-        if (UIManager.GetInstance().leftBtnClick)
+        for (int i = 0; i < listMilks.Count; i++)
         {
-            leftMilk.GetComponent<Milk>().SongNai();
+            listMilks[i].GetComponent<Milk>().SongNai();
         }
-        else
-        {
-            rightMilk.GetComponent<Milk>().SongNai();
-        }
+        listMilks.Clear();
         StartCoroutine(AudioController.GetInstance().SetAudioClipByName("门铃", false, AudioController.GetInstance().CreateAudio()));
         StartCoroutine(AudioController.GetInstance().SetAudioClipByName("好喝" + (houseIndex % 6 + 1).ToString(), false, AudioController.GetInstance().CreateAudio(),delegate() {
             if (UIManager.GetInstance().isWin)
@@ -126,6 +132,12 @@ public class ObjectController : MonoBehaviour
                 UIManager.GetInstance().GameOverEvent(true);
             }
         }));
+    }
+    public void DisableCollider() {
+        for (int i = 0; i < listHouses.Count; i++)
+        {
+            listHouses[i].GetChild(0).GetComponent<MeshCollider>().enabled = false;
+        }
     }
     
 }

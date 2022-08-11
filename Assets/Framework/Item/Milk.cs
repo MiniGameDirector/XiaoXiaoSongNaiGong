@@ -7,10 +7,8 @@ public class Milk : MonoBehaviour
 {
     public bool isStatic = true;
     public Vector3 targetPos;
-    public Vector3 startPos;
     private void Awake()
     {
-        startPos = transform.localPosition;
     }
     // Start is called before the first frame update
     void Start()
@@ -21,6 +19,8 @@ public class Milk : MonoBehaviour
         }
         else
         {
+            transform.DOMove(targetPos, 0.5f).SetEase(Ease.Linear);
+            transform.DOScale(new Vector3(0.005f, 0.005f, 0.005f), 0.5f).SetEase(Ease.Linear);
             transform.DORotate(new Vector3(0, 180, 0), 2f).SetEase(Ease.Linear).SetLoops(-1);
         }
     }
@@ -29,22 +29,6 @@ public class Milk : MonoBehaviour
     void Update()
     {
         
-    }
-    private void OnEnable()
-    {
-        if (!isStatic)
-        {
-            transform.DOMove(targetPos, 0.5f).SetEase(Ease.Linear);
-            transform.DOScale(new Vector3(0.005f, 0.005f, 0.005f), 0.5f).SetEase(Ease.Linear);
-        }
-    }
-    private void OnDisable()
-    {
-        if (!isStatic)
-        {
-            transform.localPosition = startPos;
-            transform.localScale = Vector3.zero;
-        }
     }
     Vector3 ScreenToWorld()
     {
@@ -60,7 +44,14 @@ public class Milk : MonoBehaviour
             transform.DORotate(transform.eulerAngles + new Vector3(0, 360, 0), 0.5f).SetEase(Ease.Linear);
             transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.Linear).OnComplete(delegate () {
                 UIManager.GetInstance().AddDishuNum();
-                gameObject.SetActive(false);
+                if (UIManager.GetInstance().leftBtnClick) {
+                    UIManager.GetInstance().canClickLeftBtn = true;
+                }
+                else
+                {
+                    UIManager.GetInstance().canClickRightBtn = true;
+                }
+                Destroy(this.gameObject);
             });
         });
        

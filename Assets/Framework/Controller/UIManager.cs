@@ -41,6 +41,7 @@ public class UIManager : MonoBehaviour
 
     private int leftMilkCount = 10, rightMilkCount = 10;
     public bool leftBtnClick = false;
+    public bool canClickLeftBtn = true, canClickRightBtn = true;
     /// <summary>
     /// 初始化事件
     /// </summary>
@@ -156,9 +157,10 @@ public class UIManager : MonoBehaviour
     /// </summary>
     /// <param name="milkBtnIndex"></param>
     private void MilkClickEvent(int milkBtnIndex) {
-        if (milkBtnIndex == 0 && leftMilkCount > 0)//左侧的按钮
+        if (milkBtnIndex == 0 && leftMilkCount > 0 && canClickLeftBtn)//左侧的按钮
         {
             leftBtnClick = true;
+            canClickLeftBtn = false;
             leftMilkCount--;
             Text tMilkLeft = btnMilk1.transform.Find("Text").GetComponent<Text>();
             tMilkLeft.text = leftMilkCount.ToString();
@@ -166,9 +168,10 @@ public class UIManager : MonoBehaviour
             ObjectController.GetInstance().GameScene();
             
         }
-        else if(milkBtnIndex == 1 && rightMilkCount > 0)
+        else if(milkBtnIndex == 1 && rightMilkCount > 0 && canClickRightBtn)
         {
             leftBtnClick = false;
+            canClickRightBtn = false;
             rightMilkCount--;
             Text tMilkRight = btnMilk2.transform.Find("Text").GetComponent<Text>();
             tMilkRight.text = rightMilkCount.ToString();
@@ -184,7 +187,7 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         Debug.LogError("开始游戏测试");
-        StartScene();
+        //StartScene();
         InitButtonEvent();
     }
 

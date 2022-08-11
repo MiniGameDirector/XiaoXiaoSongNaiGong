@@ -20,7 +20,7 @@ public class HouseItem : MonoBehaviour
         if (transform.name.Split('_')[1] == "1" || transform.name.Split('_')[1] == "4" || transform.name.Split('_')[1] == "8" || transform.name.Split('_')[1] == "11")
         {
             ObjectController.GetInstance().SongNai();
-            transform.GetComponent<MeshCollider>().enabled = false;
+            ObjectController.GetInstance().DisableCollider();
         }
         else
         {
