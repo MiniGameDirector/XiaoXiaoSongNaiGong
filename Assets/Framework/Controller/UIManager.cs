@@ -157,31 +157,35 @@ public class UIManager : MonoBehaviour
     /// </summary>
     /// <param name="milkBtnIndex"></param>
     private void MilkClickEvent(int milkBtnIndex) {
-        if (milkBtnIndex == 0 && leftMilkCount > 0 && canClickLeftBtn)//左侧的按钮
+        if (!ObjectController.GetInstance().bearTrans.GetComponent<BearController>().isMove)
         {
-            leftBtnClick = true;
-            canClickLeftBtn = false;
-            leftMilkCount--;
-            Text tMilkLeft = btnMilk1.transform.Find("Text").GetComponent<Text>();
-            tMilkLeft.text = leftMilkCount.ToString();
-            tMilkLeft.color = new Color((10 - leftMilkCount) * 25.5f / 255f, leftMilkCount * 25.5f / 255f, 0);
-            ObjectController.GetInstance().GameScene();
-            
+            if (milkBtnIndex == 0 && leftMilkCount > 0 && canClickLeftBtn)//左侧的按钮
+            {
+                leftBtnClick = true;
+                canClickLeftBtn = false;
+                leftMilkCount--;
+                Text tMilkLeft = btnMilk1.transform.Find("Text").GetComponent<Text>();
+                tMilkLeft.text = leftMilkCount.ToString();
+                tMilkLeft.color = new Color((10 - leftMilkCount) * 25.5f / 255f, leftMilkCount * 25.5f / 255f, 0);
+                ObjectController.GetInstance().GameScene();
+
+            }
+            else if (milkBtnIndex == 1 && rightMilkCount > 0 && canClickRightBtn)
+            {
+                leftBtnClick = false;
+                canClickRightBtn = false;
+                rightMilkCount--;
+                Text tMilkRight = btnMilk2.transform.Find("Text").GetComponent<Text>();
+                tMilkRight.text = rightMilkCount.ToString();
+                tMilkRight.color = new Color((10 - rightMilkCount) * 25.5f / 255f, rightMilkCount * 25.5f / 255f, 0);
+                ObjectController.GetInstance().GameScene();
+            }
+            if (rightMilkCount == 0 && leftMilkCount == 0)
+            {
+                isWin = true;
+            }
         }
-        else if(milkBtnIndex == 1 && rightMilkCount > 0 && canClickRightBtn)
-        {
-            leftBtnClick = false;
-            canClickRightBtn = false;
-            rightMilkCount--;
-            Text tMilkRight = btnMilk2.transform.Find("Text").GetComponent<Text>();
-            tMilkRight.text = rightMilkCount.ToString();
-            tMilkRight.color = new Color((10 - rightMilkCount) * 25.5f / 255f, rightMilkCount * 25.5f / 255f, 0);
-            ObjectController.GetInstance().GameScene();
-        }
-        if (rightMilkCount == 0 && leftMilkCount == 0)
-        {
-            isWin = true;
-        }
+        
     }
     // Start is called before the first frame update
     void Start()
@@ -206,7 +210,8 @@ public class UIManager : MonoBehaviour
         });
         int dishuNum = int.Parse(txtJifenBan1.text);
         dishuNum++;
-        txtJifenBan1.GetComponent<CountingNumber>().ChangeTo(dishuNum, 0.2f);
+        //txtJifenBan1.GetComponent<CountingNumber>().ChangeTo(dishuNum, 0.2f);
+        txtJifenBan1.text = dishuNum.ToString();
         txtJifenBan2.text = dishuNum.ToString();
     }
 }

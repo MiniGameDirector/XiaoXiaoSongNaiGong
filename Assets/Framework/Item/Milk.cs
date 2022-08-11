@@ -44,13 +44,8 @@ public class Milk : MonoBehaviour
             transform.DORotate(transform.eulerAngles + new Vector3(0, 360, 0), 0.5f).SetEase(Ease.Linear);
             transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.Linear).OnComplete(delegate () {
                 UIManager.GetInstance().AddDishuNum();
-                if (UIManager.GetInstance().leftBtnClick) {
-                    UIManager.GetInstance().canClickLeftBtn = true;
-                }
-                else
-                {
-                    UIManager.GetInstance().canClickRightBtn = true;
-                }
+                UIManager.GetInstance().canClickLeftBtn = true;
+                UIManager.GetInstance().canClickRightBtn = true;
                 Destroy(this.gameObject);
             });
         });

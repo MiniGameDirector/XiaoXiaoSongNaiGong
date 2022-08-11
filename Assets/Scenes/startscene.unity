@@ -3728,7 +3728,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &742413230
 Transform:
   m_ObjectHideFlags: 0
@@ -3762,6 +3762,7 @@ MonoBehaviour:
   bearStandePos: {x: 4, y: -0.5, z: 11}
   bearTargetPos: {x: 0, y: 0, z: 0}
   bearAnimator: {fileID: 0}
+  isMove: 0
   isStart: 0
 --- !u!195 &742413232
 NavMeshAgent:
@@ -6737,7 +6738,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1879863749
 RectTransform:
   m_ObjectHideFlags: 0

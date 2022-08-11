@@ -14,8 +14,9 @@ public class BearController : MonoBehaviour
     public Animator bearAnimator;
     private Vector3 bearStartPos;
     private NavMeshAgent meshAgent;
-    private bool isMove = false;
+    public bool isMove = false;
     public bool isStart = false;
+    public Action lastComplete = null;
 
     // Start is called before the first frame update
     void Awake()
@@ -27,7 +28,7 @@ public class BearController : MonoBehaviour
     }
     private void Start()
     {
-        BearStart();
+        //BearStart();
     }
 
     // Update is called once per frame
@@ -38,11 +39,19 @@ public class BearController : MonoBehaviour
             Debug.Log("停止");
             if (!isStart)
             {
-                if (!PanduanForward())
+                if (lastComplete != null)
                 {
-                    transform.eulerAngles += new Vector3(0, 180, 0);
+                    lastComplete();
+                    lastComplete = null;
                 }
-                SetBearIdle();
+                else
+                {
+                    if (!PanduanForward())
+                    {
+                        transform.eulerAngles += new Vector3(0, 180, 0);
+                    }
+                    SetBearIdle();
+                }
             }
             else
             {
@@ -86,10 +95,11 @@ public class BearController : MonoBehaviour
     /// <summary>
     /// 初始化 animation、transform
     /// </summary>
-    public void BearStart() {
+    private void OnEnable()
+    {
         bear.position = bearStartPos;
         bearAnimator.Play("Run");
-        bear.DOMove(bearStandePos, 3f).SetEase(Ease.Linear).OnComplete(delegate() {
+        bear.DOMove(bearStandePos, 3f).SetEase(Ease.Linear).OnComplete(delegate () {
             bearAnimator.SetBool("Skidding", true);
             StartCoroutine(AudioController.GetInstance().SetAudioClipByName("开场语音", false, null, delegate () {
                 UIManager.GetInstance().canChangeScene = true;
