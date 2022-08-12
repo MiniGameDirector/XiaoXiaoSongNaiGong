@@ -9,14 +9,12 @@ public class BearController : MonoBehaviour
 {
 
     public Transform bear;
-    public string startAnimName, latterAnimName;
     public Vector3 bearStandePos, bearTargetPos;
     public Animator bearAnimator;
     private Vector3 bearStartPos;
     private NavMeshAgent meshAgent;
-    public bool isMove = false;
+    private bool isMove = false;
     public bool isStart = false;
-    public Action lastComplete = null;
 
     // Start is called before the first frame update
     void Awake()
@@ -34,24 +32,17 @@ public class BearController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         if (Vector3.Distance(transform.position, bearTargetPos) < 0.5f && isMove)
         {
             Debug.Log("停止");
             if (!isStart)
             {
-                if (lastComplete != null)
+                if (!PanduanForward())
                 {
-                    lastComplete();
-                    lastComplete = null;
+                    transform.eulerAngles += new Vector3(0, 180, 0);
                 }
-                else
-                {
-                    if (!PanduanForward())
-                    {
-                        transform.eulerAngles += new Vector3(0, 180, 0);
-                    }
-                    SetBearIdle();
-                }
+                SetBearIdle();
             }
             else
             {
@@ -60,8 +51,25 @@ public class BearController : MonoBehaviour
                 isStart = false;
             }
             isMove = false;
-            
         }
+    }
+    /// <summary>
+    /// 判断小熊是否已经停下
+    /// </summary>
+    /// <returns></returns>
+    public bool BearIsStop() {
+        //判断是否到达目的地
+        if (!meshAgent.pathPending)//判断正在计算的路径
+        {
+            if (meshAgent.remainingDistance <= meshAgent.stoppingDistance)//是否还在路径上
+            {
+                if (!meshAgent.hasPath || meshAgent.velocity.sqrMagnitude == 0f)//是否到达目的地，到达就停下
+                {
+                    return true;
+                }
+            }
+        }
+        return true;
     }
     /// <summary>
     /// 设置小熊移动
@@ -69,18 +77,14 @@ public class BearController : MonoBehaviour
     /// <param name="targetPos"></param>
     /// <param name="_complete"></param>
     /// <returns></returns>
-    public bool SetBearMove(Vector3 targetPos) {
-        if (!isMove)
-        {
-            bearTargetPos = targetPos;
-            bearAnimator.Play("Run_0");
-            meshAgent.SetDestination(targetPos);
-            isMove = true;
-            return true;
-        }
-        return false;
+    public void SetBearMove(Vector3 targetPos) {
+        bearTargetPos = targetPos;
+        bearAnimator.Play("Run_0");
+        meshAgent.SetDestination(targetPos);
+        isMove = true;
     }
     private void SetBearIdle() {
+        //ObjectController.GetInstance().CreateMilk();
         bearAnimator.Play("Idle & waving_0");
         StartCoroutine(AudioController.GetInstance().SetAudioClipByName("冒泡提示", false, AudioController.GetInstance().CreateAudio()));
     }

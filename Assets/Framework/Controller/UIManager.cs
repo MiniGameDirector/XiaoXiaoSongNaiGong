@@ -157,7 +157,7 @@ public class UIManager : MonoBehaviour
     /// </summary>
     /// <param name="milkBtnIndex"></param>
     private void MilkClickEvent(int milkBtnIndex) {
-        if (!ObjectController.GetInstance().bearTrans.GetComponent<BearController>().isMove)
+        if (ObjectController.GetInstance().bearTrans.GetComponent<BearController>().BearIsStop())
         {
             if (milkBtnIndex == 0 && leftMilkCount > 0 && canClickLeftBtn)//×ó²àµÄ°´Å¥
             {

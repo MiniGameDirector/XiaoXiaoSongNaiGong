@@ -29,6 +29,8 @@ public class ObjectController : MonoBehaviour
     public Transform leftTarget, rightTarget;
     public GameObject milkGo;
     private int houseIndex = 1;
+
+    private Tweener tweenerTemp = null;
     // Start is called before the first frame update
     void Start()
     {
@@ -82,40 +84,35 @@ public class ObjectController : MonoBehaviour
         Resources.UnloadUnusedAssets();
         if (areaIndex != 0)
         {
-            if (bearTrans.GetComponent<BearController>().SetBearMove(listBearPos[areaIndex].position))
+            bearTrans.GetComponent<BearController>().SetBearMove(listBearPos[areaIndex].position);
+            if (tweenerTemp != null)
             {
-                Camera.main.transform.DOMove(listCameraPos[areaIndex].localPosition, 2f).SetEase(Ease.Linear);
-                Camera.main.transform.DORotate(listCameraPos[areaIndex].localEulerAngles, 2f).SetEase(Ease.Linear).OnComplete(delegate() {
-                    listHouses[areaIndex - 1].GetComponent<Animator>().enabled = true;
-                    listHouses[areaIndex - 1].GetChild(0).GetComponent<MeshCollider>().enabled = true;
-                    if (UIManager.GetInstance().leftBtnClick)
-                    {
-                        GameObject go = Instantiate(milkGo);
-                        go.transform.position = leftTarget.position;
-                        go.transform.localScale = Vector3.zero;
-                        go.GetComponent<Milk>().targetPos = listMilkPos[areaIndex - 1].position;
-                        listMilks.Add(go.transform);
-                    }
-                    else
-                    {
-                        GameObject go = Instantiate(milkGo);
-                        go.transform.position = rightTarget.position;
-                        go.transform.localScale = Vector3.zero;
-                        go.GetComponent<Milk>().targetPos = listMilkPos[areaIndex - 1].position;
-                        listMilks.Add(go.transform);
-                    }
-                    //listHouses[areaIndex - 1].DOLocalRotate(new Vector3(0,0,))
-                });
+                Camera.main.transform.DOKill();
+                TweenKillAction(areaIndex == 1 ? 12 : areaIndex - 1);
             }
+            tweenerTemp = Camera.main.transform.DOMove(listCameraPos[areaIndex].localPosition, 2f).SetEase(Ease.Linear);
+            Camera.main.transform.DORotate(listCameraPos[areaIndex].localEulerAngles, 2f).SetEase(Ease.Linear).OnComplete(delegate ()
+            {
+                listHouses[areaIndex - 1].GetComponent<Animator>().enabled = true;
+                listHouses[areaIndex - 1].GetChild(0).GetComponent<MeshCollider>().enabled = true;
+                CreateMilk();
+                tweenerTemp = null;
+            });
         }
         else
         {
             bearTrans.GetComponent<BearController>().isStart = true;
-            if (bearTrans.GetComponent<BearController>().SetBearMove(listBearPos[areaIndex].position)) {
-                Camera.main.transform.DOMove(listCameraPos[areaIndex].localPosition, 2f).SetEase(Ease.Linear);
-                Camera.main.transform.DORotate(listCameraPos[areaIndex].localEulerAngles, 2f).SetEase(Ease.Linear);
-            } 
+            bearTrans.GetComponent<BearController>().SetBearMove(listBearPos[areaIndex].position);
+            Camera.main.transform.DOMove(listCameraPos[areaIndex].localPosition, 2f).SetEase(Ease.Linear);
+            Camera.main.transform.DORotate(listCameraPos[areaIndex].localEulerAngles, 2f).SetEase(Ease.Linear);
         }
+    }
+    private void TweenKillAction(int _index) {
+        Camera.main.transform.position = listCameraPos[_index].localPosition;
+        Camera.main.transform.eulerAngles = listCameraPos[_index].localEulerAngles;
+        listHouses[_index - 1].GetComponent<Animator>().enabled = true;
+        listHouses[_index - 1].GetChild(0).GetComponent<MeshCollider>().enabled = true;
+        CreateMilk();
     }
     public void SongNai() {
 
@@ -137,6 +134,27 @@ public class ObjectController : MonoBehaviour
         for (int i = 0; i < listHouses.Count; i++)
         {
             listHouses[i].GetChild(0).GetComponent<MeshCollider>().enabled = false;
+        }
+    }
+    /// <summary>
+    /// 小熊跑过去之后创建milk
+    /// </summary>
+    public void CreateMilk() {
+        if (UIManager.GetInstance().leftBtnClick)
+        {
+            GameObject go = Instantiate(milkGo);
+            go.transform.position = leftTarget.position;
+            go.transform.localScale = Vector3.zero;
+            go.GetComponent<Milk>().targetPos = listMilkPos[houseIndex == 1 ? 11 : houseIndex - 2].position;
+            listMilks.Add(go.transform);
+        }
+        else
+        {
+            GameObject go = Instantiate(milkGo);
+            go.transform.position = rightTarget.position;
+            go.transform.localScale = Vector3.zero;
+            go.GetComponent<Milk>().targetPos = listMilkPos[houseIndex == 1 ? 11 : houseIndex - 2].position;
+            listMilks.Add(go.transform);
         }
     }
     
