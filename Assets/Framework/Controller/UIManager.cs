@@ -36,7 +36,6 @@ public class UIManager : MonoBehaviour
     public Transform panelOver;
     public Text txtJifenBan1, txtJifenBan2;
     public Button btnMilk1, btnMilk2;
-    public bool canChangeScene = false;
     public bool isWin = false;
 
     private int leftMilkCount = 10, rightMilkCount = 10;
@@ -52,10 +51,7 @@ public class UIManager : MonoBehaviour
         btnTurn.onClick.AddListener(delegate () { Application.Quit(); });
         //游戏结束
         btnGameOver.onClick.AddListener(delegate() {
-            if (canChangeScene)
-            {
-                GameOverEvent(false);
-            }
+            GameOverEvent(false);
         });
         //游戏开场按钮
         btnStartScene.onClick.AddListener(delegate ()
@@ -65,15 +61,11 @@ public class UIManager : MonoBehaviour
         //游戏场景按钮
         btnGameScene.onClick.AddListener(delegate ()
         {
-            if (canChangeScene)
-            {
-                GameScene();
-            }
+            GameScene();
         });
         //最终退出游戏按钮
         btnRealOver.onClick.AddListener(delegate () {
-            StartCoroutine(AudioController.GetInstance().SetAudioClipByName("结束语音", false, null, GameOverRealEvent));
-            AudioController.GetInstance().DisableOther();
+            GameOverRealEvent();
         });
         //恢复游戏
         btnReturn.onClick.AddListener(delegate ()
@@ -134,6 +126,8 @@ public class UIManager : MonoBehaviour
         text2.color = Color.white;
         //initObj.gameObject.SetActive(false);
         panelRecord.gameObject.SetActive(true);
+        initObj.GetComponent<BearController>().ResetNormal();
+        AudioController.GetInstance().audioSource.clip = null;
         //ObjectController.GetInstance().GameScene();
     }
     /// <summary>
@@ -143,7 +137,10 @@ public class UIManager : MonoBehaviour
         Debug.Log("游戏结束");
         isWin = _iswin;
         AudioController.GetInstance().DisableOther();
-        StartCoroutine(AudioController.GetInstance().SetAudioClipByName("胜利4", false, AudioController.GetInstance().CreateAudio()));
+        StartCoroutine(AudioController.GetInstance().SetAudioClipByName("胜利4", false, AudioController.GetInstance().CreateAudio(),delegate() {
+            StartCoroutine(AudioController.GetInstance().SetAudioClipByName("结束语音", false, null));
+            AudioController.GetInstance().DisableOther();
+        }));
         panelOver.gameObject.SetActive(true);
     }
     /// <summary>

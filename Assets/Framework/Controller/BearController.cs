@@ -105,10 +105,7 @@ public class BearController : MonoBehaviour
         bearAnimator.Play("Run");
         bear.DOMove(bearStandePos, 3f).SetEase(Ease.Linear).OnComplete(delegate () {
             bearAnimator.SetBool("Skidding", true);
-            StartCoroutine(AudioController.GetInstance().SetAudioClipByName("开场语音", false, null, delegate () {
-                UIManager.GetInstance().canChangeScene = true;
-                UIManager.GetInstance().GameScene();
-            }));
+            StartCoroutine(AudioController.GetInstance().SetAudioClipByName("开场语音", false, null));
         });
     }
     /// <summary>
@@ -122,8 +119,12 @@ public class BearController : MonoBehaviour
         yield return new WaitForSeconds(3f);
         bearAnimator.SetBool("Skidding", true);
         StartCoroutine(AudioController.GetInstance().SetAudioClipByName("开场语音", false, null, delegate () {
-            UIManager.GetInstance().canChangeScene = true;
             UIManager.GetInstance().GameScene();
         }));
+    }
+    public void ResetNormal() {
+        StopAllCoroutines();
+        DOTween.KillAll();
+        bearAnimator.Play("Idle & waving_0");
     }
 }
